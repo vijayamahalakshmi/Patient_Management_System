@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import '../styles/styles.css';
+import { useNavigate } from 'react-router-dom';
 
 function PatientForm() {
+    const navigate = useNavigate();
   const [form, setForm] = useState({ firstname: '', lastname: '', email: '', address: '' });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -52,7 +54,8 @@ function PatientForm() {
     api.post('/patients', form)
       .then(() => {
         alert('Patient added successfully');
-        setForm({ firstname: '', lastname: '', email: '', address: '' }); 
+         navigate('/');
+       
       })
       .catch(err => {
         if (err.response?.data?.error) {

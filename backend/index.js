@@ -15,7 +15,13 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 sequelize.sync()
   .then(() => console.log(' Database synced with Sequelize'))
-  .catch(err => console.error('Sync error:', err));
+  .catch(err => {
+    console.error('Database sync error:', err);
+  
+  });
+
+
+
 
 // Create patient API
 app.post('/patients', async (req, res) => {
@@ -39,9 +45,10 @@ app.post('/patients', async (req, res) => {
       return res.status(409).json({ error: 'Email already exists' });
     }
 
+    const now = new Date();
     const [insertResult] = await sequelize.query(
-      'INSERT INTO patient (firstname, lastname, email, address) VALUES (?, ?, ?, ?)',
-      { replacements: [firstname, lastname, email, address] }
+      'INSERT INTO patient (firstname, lastname, email, address, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
+      { replacements: [firstname, lastname, email, address, now, now] }
     );
 
     res.status(201).json({ id: insertResult, message: 'Patient created' });
@@ -122,9 +129,10 @@ app.put('/patients/:id', async (req, res) => {
       return res.status(409).json({ error: 'Email already in use' });
     }
 
+    const now = new Date();
     await sequelize.query(
-      'UPDATE patient SET firstname = ?, lastname = ?, email = ?, address = ? WHERE id = ?',
-      { replacements: [firstname, lastname, email, address, req.params.id] }
+      'UPDATE patient SET firstname = ?, lastname = ?, email = ?, address = ?, updatedAt = ? WHERE id = ?',
+      { replacements: [firstname, lastname, email, address, now, req.params.id] }
     );
 
     res.json({ message: 'Patient updated' });
